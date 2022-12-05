@@ -29,7 +29,7 @@ module.exports = {
     output: {
         clean: true,
         path: path.resolve(__dirname, 'dist'),
-        filename: '[name].[chunkhash].min.[ext]',
+        filename: '[name].[chunkhash].min.js',
         chunkFilename: '[name].[chunkhash].chunk.[ext]'
     },
     plugins: [
