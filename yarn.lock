@@ -1995,6 +1995,11 @@ picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.3.1:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.1.tgz#3ba3833733646d9d3e4995946c1365a67fb07a42"
   integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
 
+pixi-viewport@^4.38.0:
+  version "4.38.0"
+  resolved "https://registry.yarnpkg.com/pixi-viewport/-/pixi-viewport-4.38.0.tgz#7deeec65a75046315638999d0379ff54ec26bdc3"
+  integrity sha512-TGj6Ymk/BU0wZcW4c1eP4e96aETJmB7jhjBflMjQU06/ZHPy7qHw8JyDqZ+C84SEg0ewCHjDNZ2vgR3Kjk74BQ==
+
 pixi.js@^7.0.4:
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-7.0.4.tgz#4bd8dc620aa407b2220de328c55da3d0a5730ab5"

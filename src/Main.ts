@@ -1,12 +1,16 @@
+import { Viewport } from 'pixi-viewport';
 import { Application } from 'pixi.js';
 import './Style.css';
 
-export let app = new Application({
-    width: 1920,
-    height: 1080,
+export const app = new Application({
     backgroundColor: 'black',
+    resolution: 1,
+    antialias: true,
+    hello: true,
 });
 
-document.body.appendChild(app.view as HTMLCanvasElement);
+export const viewport = new Viewport({
+    divWheel: app.view as HTMLCanvasElement,
+});
 
 require('./Init');

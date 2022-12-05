@@ -22,6 +22,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+    "pixi-viewport": "^4.38.0",
     "pixi.js": "^7.0.4"
   }
 }
