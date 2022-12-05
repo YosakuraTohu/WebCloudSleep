@@ -1,0 +1,33 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+    entry: './src/Main.ts',
+    mode: 'development',
+    performance: {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
+    },
+    devtool: 'inline-source-map',
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            }
+        ]
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js']
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'WebCloudSleep'
+        })
+    ]
+};
