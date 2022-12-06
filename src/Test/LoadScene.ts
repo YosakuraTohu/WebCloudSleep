@@ -11,7 +11,28 @@ type Character = {
     emotions: Array<Texture<Resource>>;
 };
 
-let sence: any;
+type MaterialPosition = {
+    xPos: number;
+    yPos: number;
+};
+
+type MaterialScene<V extends string> = {
+    [propName in V]: Map<number, Array<MaterialPosition>>;
+};
+
+enum Scene {
+    sleepers = 'sleepers',
+    backgrounds = 'backgrounds',
+    decorates = 'decorates',
+    beds = 'beds',
+}
+
+let sence_processed: MaterialScene<Scene> = {
+    sleepers: new Map(),
+    backgrounds: new Map(),
+    decorates: new Map(),
+    beds: new Map(),
+};
 
 let sleepers: any;
 let sleepers_assets: Array<Character> = [];
@@ -28,18 +49,47 @@ let beds: any;
 let beds_assets: Array<Texture<Resource>> = [];
 let beds_offsets: Array<Offset> = [];
 
-let senceContainer = new Container();
+export let senceContainer = new Container();
+senceContainer.sortableChildren = true;
 viewport.addChild(senceContainer);
 
 (async () => {
     await fetch('Packages/Sunset Inn/contents/scene.json')
         .then(r => r.json())
         .then(j => {
-            j.sleepers.sort((a: any, b: any) => a.yPos - b.yPos);
-            j.backgrounds.sort((a: any, b: any) => a.yPos - b.yPos);
-            j.decorates.sort((a: any, b: any) => a.yPos - b.yPos);
-            j.beds.sort((a: any, b: any) => a.yPos - b.yPos);
-            sence = j;
+            j.sleepers
+                .sort((a: any, b: any) => a.yPos - b.yPos)
+                .forEach((i: any) =>
+                    sence_processed.sleepers.set(i.materialId, [
+                        ...(sence_processed.sleepers.get(i.materialId) ?? []),
+                        { xPos: i.xPos, yPos: i.yPos },
+                    ]),
+                );
+            j.backgrounds
+                .sort((a: any, b: any) => a.yPos - b.yPos)
+                .forEach((i: any) =>
+                    sence_processed.backgrounds.set(i.materialId, [
+                        ...(sence_processed.backgrounds.get(i.materialId) ??
+                            []),
+                        { xPos: i.xPos, yPos: i.yPos },
+                    ]),
+                );
+            j.decorates
+                .sort((a: any, b: any) => a.yPos - b.yPos)
+                .forEach((i: any) =>
+                    sence_processed.decorates.set(i.materialId, [
+                        ...(sence_processed.decorates.get(i.materialId) ?? []),
+                        { xPos: i.xPos, yPos: i.yPos },
+                    ]),
+                );
+            j.beds
+                .sort((a: any, b: any) => a.yPos - b.yPos)
+                .forEach((i: any) =>
+                    sence_processed.beds.set(i.materialId, [
+                        ...(sence_processed.beds.get(i.materialId) ?? []),
+                        { xPos: i.xPos, yPos: i.yPos },
+                    ]),
+                );
         });
 
     await fetch('Packages/Sunset Inn/contents/sleepers.json')
@@ -98,31 +148,43 @@ viewport.addChild(senceContainer);
         }
     })();
 
-    sence.backgrounds.forEach((element: any) => {
-        const sp = new Sprite(backgrounds_assets[element.materialId]);
-        sp.x = element.xPos;
-        sp.y = element.yPos;
-        senceContainer.addChild(sp);
+    sence_processed.backgrounds.forEach((v, k) => {
+        v.forEach(p => {
+            const sp = new Sprite(backgrounds_assets[k]);
+            sp.x = p.xPos;
+            sp.y = p.yPos;
+            sp.zIndex = p.yPos;
+            senceContainer.addChild(sp);
+        });
     });
 
-    sence.decorates.forEach((element: any) => {
-        const sp = new Sprite(decorates_assets[element.materialId]);
-        sp.x = element.xPos - decorates_offsets[element.materialId].x + 150;
-        sp.y = element.yPos - decorates_offsets[element.materialId].y + 150;
-        senceContainer.addChild(sp);
+    sence_processed.decorates.forEach((v, k) => {
+        v.forEach(p => {
+            const sp = new Sprite(decorates_assets[k]);
+            sp.x = p.xPos - decorates_offsets[k].x + 159;
+            sp.y = p.yPos - decorates_offsets[k].y + 145;
+            sp.zIndex = p.yPos + 300
+            senceContainer.addChild(sp);
+        });
     });
 
-    sence.beds.forEach((element: any) => {
-        const sp = new Sprite(beds_assets[element.materialId]);
-        sp.x = element.xPos - beds_offsets[element.materialId].x + 150;
-        sp.y = element.yPos - beds_offsets[element.materialId].y + 150;
-        senceContainer.addChild(sp);
+    sence_processed.beds.forEach((v, k) => {
+        v.forEach(p => {
+            const sp = new Sprite(beds_assets[k]);
+            sp.x = p.xPos - beds_offsets[k].x + 159;
+            sp.y = p.yPos - beds_offsets[k].y + 145;
+            sp.zIndex = p.yPos + 300
+            senceContainer.addChild(sp);
+        });
     });
 
-    sence.sleepers.forEach((element: any) => {
-        const sp = new Sprite(sleepers_assets[element.materialId].texture);
-        sp.x = element.xPos - sleepers_offsets[element.materialId].x + 150;
-        sp.y = element.yPos - sleepers_offsets[element.materialId].y + 150;
-        senceContainer.addChild(sp);
+    sence_processed.sleepers.forEach((v, k) => {
+        v.forEach(p => {
+            const sp = new Sprite(sleepers_assets[k].texture);
+            sp.x = p.xPos - sleepers_offsets[k].x + 159;
+            sp.y = p.yPos - sleepers_offsets[k].y + 145;
+            sp.zIndex = p.yPos + 300
+            senceContainer.addChild(sp);
+        });
     });
 })();
