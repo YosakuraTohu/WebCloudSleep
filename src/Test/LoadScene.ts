@@ -6,9 +6,34 @@ type Offset = {
     y: number;
 };
 
-type Character = {
+type SenceAsset = {
     texture: Texture<Resource>;
+};
+
+type SenceAssetWithOffset = SenceAsset & {
+    offset: Offset;
+};
+
+type BackgroundsAsset = SenceAsset;
+
+type DecoratesAsset = SenceAssetWithOffset;
+
+type BedsAsset = SenceAssetWithOffset & {
+    characters: Array<Texture<Resource>>;
+};
+
+type CharacterAsset = SenceAssetWithOffset & {
     emotions: Array<Texture<Resource>>;
+};
+
+type MixedAsset<V extends string> = Object & {
+    [propName in V]:
+        | SenceAsset
+        | SenceAssetWithOffset
+        | BackgroundsAsset
+        | DecoratesAsset
+        | BedsAsset
+        | CharacterAsset;
 };
 
 type MaterialPosition = {
@@ -16,7 +41,7 @@ type MaterialPosition = {
     yPos: number;
 };
 
-type MaterialScene<V extends string> = {
+type MaterialScene<V extends string> = Object & {
     [propName in V]: Map<number, Array<MaterialPosition>>;
 };
 
@@ -35,19 +60,16 @@ let sence_processed: MaterialScene<Scene> = {
 };
 
 let sleepers: any;
-let sleepers_assets: Array<Character> = [];
-let sleepers_offsets: Array<Offset> = [];
+let sleepers_assets: Array<CharacterAsset> = [];
 
 let backgrounds: any;
-let backgrounds_assets: Array<Texture<Resource>> = [];
+let backgrounds_assets: Array<BackgroundsAsset> = [];
 
 let decorates: any;
-let decorates_assets: Array<Texture<Resource>> = [];
-let decorates_offsets: Array<Offset> = [];
+let decorates_assets: Array<DecoratesAsset> = [];
 
 let beds: any;
-let beds_assets: Array<Texture<Resource>> = [];
-let beds_offsets: Array<Offset> = [];
+let beds_assets: Array<BedsAsset> = [];
 
 export let senceContainer = new Container();
 senceContainer.sortableChildren = true;
@@ -111,60 +133,75 @@ viewport.addChild(senceContainer);
                 );
                 e.push(nc);
             }
-            sleepers_assets.push({ texture: c, emotions: e });
-            sleepers_offsets.push({ x: i.offset[0], y: i.offset[1] });
+            sleepers_assets.push({
+                texture: c,
+                emotions: e,
+                offset: { x: i.offset[0], y: i.offset[1] },
+            });
         }
 
         for (const i of backgrounds.materials) {
             let c = await Assets.load(
                 `Packages/Sunset Inn/contents/backgrounds/${i.filename}`,
             );
-            backgrounds_assets.push(c);
+            backgrounds_assets.push({ texture: c });
         }
 
         for (const i of decorates.materials) {
             let c = await Assets.load(
                 `Packages/Sunset Inn/contents/decorates/${i.filename}`,
             );
-            decorates_assets.push(c);
-            decorates_offsets.push({ x: i.offset[0], y: i.offset[1] });
+            decorates_assets.push({
+                texture: c,
+                offset: { x: i.offset[0], y: i.offset[1] },
+            });
         }
 
         for (const i of beds.materials) {
             let c = await Assets.load(
                 `Packages/Sunset Inn/contents/beds/${i.filename}`,
             );
-            beds_assets.push(c);
-            beds_offsets.push({ x: i.offset[0], y: i.offset[1] });
+            let e: Array<Texture<Resource>> = [];
+            for (const k of i.sleepfilenames) {
+                let nc = await Assets.load(
+                    `Packages/Sunset Inn/contents/beds/bedsleep/${i.filename}/${k}`,
+                );
+                e.push(nc);
+            }
+            beds_assets.push({
+                texture: c,
+                characters: e,
+                offset: { x: i.offset[0], y: i.offset[1] },
+            });
         }
     })();
 
     sence_processed.backgrounds.forEach((v, k) => {
         v.forEach(p => {
-            const sp = new Sprite(backgrounds_assets[k]);
+            const sp = new Sprite(backgrounds_assets[k].texture);
             sp.x = p.xPos;
             sp.y = p.yPos;
-            sp.zIndex = p.yPos;
+            sp.zIndex = p.yPos - 300;
             senceContainer.addChild(sp);
         });
     });
 
     sence_processed.decorates.forEach((v, k) => {
         v.forEach(p => {
-            const sp = new Sprite(decorates_assets[k]);
-            sp.x = p.xPos - decorates_offsets[k].x + 159;
-            sp.y = p.yPos - decorates_offsets[k].y + 145;
-            sp.zIndex = p.yPos + 300;
+            const sp = new Sprite(decorates_assets[k].texture);
+            sp.x = p.xPos - decorates_assets[k].offset.x + 159;
+            sp.y = p.yPos - decorates_assets[k].offset.y + 145;
+            sp.zIndex = p.yPos;
             senceContainer.addChild(sp);
         });
     });
 
     sence_processed.beds.forEach((v, k) => {
         v.forEach(p => {
-            const sp = new Sprite(beds_assets[k]);
-            sp.x = p.xPos - beds_offsets[k].x + 159;
-            sp.y = p.yPos - beds_offsets[k].y + 145;
-            sp.zIndex = p.yPos + 300;
+            const sp = new Sprite(beds_assets[k].texture);
+            sp.x = p.xPos - beds_assets[k].offset.x + 159;
+            sp.y = p.yPos - beds_assets[k].offset.y + 145;
+            sp.zIndex = p.yPos;
             senceContainer.addChild(sp);
         });
     });
@@ -172,9 +209,9 @@ viewport.addChild(senceContainer);
     sence_processed.sleepers.forEach((v, k) => {
         v.forEach(p => {
             const sp = new Sprite(sleepers_assets[k].texture);
-            sp.x = p.xPos - sleepers_offsets[k].x + 159;
-            sp.y = p.yPos - sleepers_offsets[k].y + 145;
-            sp.zIndex = p.yPos + 300;
+            sp.x = p.xPos - sleepers_assets[k].offset.x + 159;
+            sp.y = p.yPos - sleepers_assets[k].offset.y + 145;
+            sp.zIndex = p.yPos;
             senceContainer.addChild(sp);
         });
     });
