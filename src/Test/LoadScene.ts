@@ -57,39 +57,30 @@ viewport.addChild(senceContainer);
     await fetch('Packages/Sunset Inn/contents/scene.json')
         .then(r => r.json())
         .then(j => {
-            j.sleepers
-                .sort((a: any, b: any) => a.yPos - b.yPos)
-                .forEach((i: any) =>
-                    sence_processed.sleepers.set(i.materialId, [
-                        ...(sence_processed.sleepers.get(i.materialId) ?? []),
-                        { xPos: i.xPos, yPos: i.yPos },
-                    ]),
-                );
-            j.backgrounds
-                .sort((a: any, b: any) => a.yPos - b.yPos)
-                .forEach((i: any) =>
-                    sence_processed.backgrounds.set(i.materialId, [
-                        ...(sence_processed.backgrounds.get(i.materialId) ??
-                            []),
-                        { xPos: i.xPos, yPos: i.yPos },
-                    ]),
-                );
-            j.decorates
-                .sort((a: any, b: any) => a.yPos - b.yPos)
-                .forEach((i: any) =>
-                    sence_processed.decorates.set(i.materialId, [
-                        ...(sence_processed.decorates.get(i.materialId) ?? []),
-                        { xPos: i.xPos, yPos: i.yPos },
-                    ]),
-                );
-            j.beds
-                .sort((a: any, b: any) => a.yPos - b.yPos)
-                .forEach((i: any) =>
-                    sence_processed.beds.set(i.materialId, [
-                        ...(sence_processed.beds.get(i.materialId) ?? []),
-                        { xPos: i.xPos, yPos: i.yPos },
-                    ]),
-                );
+            j.sleepers.forEach((i: any) =>
+                sence_processed.sleepers.set(i.materialId, [
+                    ...(sence_processed.sleepers.get(i.materialId) ?? []),
+                    { xPos: i.xPos, yPos: i.yPos },
+                ]),
+            );
+            j.backgrounds.forEach((i: any) =>
+                sence_processed.backgrounds.set(i.materialId, [
+                    ...(sence_processed.backgrounds.get(i.materialId) ?? []),
+                    { xPos: i.xPos, yPos: i.yPos },
+                ]),
+            );
+            j.decorates.forEach((i: any) =>
+                sence_processed.decorates.set(i.materialId, [
+                    ...(sence_processed.decorates.get(i.materialId) ?? []),
+                    { xPos: i.xPos, yPos: i.yPos },
+                ]),
+            );
+            j.beds.forEach((i: any) =>
+                sence_processed.beds.set(i.materialId, [
+                    ...(sence_processed.beds.get(i.materialId) ?? []),
+                    { xPos: i.xPos, yPos: i.yPos },
+                ]),
+            );
         });
 
     await fetch('Packages/Sunset Inn/contents/sleepers.json')
@@ -163,7 +154,7 @@ viewport.addChild(senceContainer);
             const sp = new Sprite(decorates_assets[k]);
             sp.x = p.xPos - decorates_offsets[k].x + 159;
             sp.y = p.yPos - decorates_offsets[k].y + 145;
-            sp.zIndex = p.yPos + 300
+            sp.zIndex = p.yPos + 300;
             senceContainer.addChild(sp);
         });
     });
@@ -173,7 +164,7 @@ viewport.addChild(senceContainer);
             const sp = new Sprite(beds_assets[k]);
             sp.x = p.xPos - beds_offsets[k].x + 159;
             sp.y = p.yPos - beds_offsets[k].y + 145;
-            sp.zIndex = p.yPos + 300
+            sp.zIndex = p.yPos + 300;
             senceContainer.addChild(sp);
         });
     });
@@ -183,7 +174,7 @@ viewport.addChild(senceContainer);
             const sp = new Sprite(sleepers_assets[k].texture);
             sp.x = p.xPos - sleepers_offsets[k].x + 159;
             sp.y = p.yPos - sleepers_offsets[k].y + 145;
-            sp.zIndex = p.yPos + 300
+            sp.zIndex = p.yPos + 300;
             senceContainer.addChild(sp);
         });
     });
