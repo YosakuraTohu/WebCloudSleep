@@ -9,15 +9,15 @@ type SceneObject = {
 
 type SceneObjectProxy = ProxyHandler<SceneObject> & {
     get: (target: SceneObject, key: keyof SceneObject) => {};
-    set: (target: SceneObject, key: keyof SceneObject, value: SceneObject[keyof SceneObject]) => {}
+    set: (target: SceneObject, key: keyof SceneObject, value: SceneObject[keyof SceneObject]) => SceneObject;
 }
 
 type SceneMap = Array<ProxyConstructor>
 
-let scene_handler: SceneObjectProxy = {
+/* let scene_handler: SceneObjectProxy = {
     get: (target: SceneObject, key: keyof SceneObject) => target[key],
-    set: (target: SceneObject, key: keyof SceneObject, value: SceneObject[keyof SceneObject]) => target[key]=value
-}
+    set: (target: SceneObject, key: keyof SceneObject, value: SceneObject[keyof SceneObject]) => value
+} */
 
 let p = new Proxy({num: 0}, {
     get: target => {

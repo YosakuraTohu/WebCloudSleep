@@ -1,4 +1,4 @@
 import './BaseScene';
 //import './UserPage';
-//import './LoadScene';
+import './LoadScene';
 import './Plyer';
