@@ -1,13 +1,14 @@
 import {
     Assets,
     Container,
-    DEG_TO_RAD,
     Graphics,
     Resource,
     Sprite,
     Texture,
 } from 'pixi.js';
+import { v4 as uuid } from 'uuid';
 import { viewport } from '../Main';
+import { map_judge } from './Reach';
 
 interface SceneMap {
     layer: Layer;
@@ -261,6 +262,7 @@ class Scene {
                 });
         }
         this.LoadScene();
+        this.creatCharacter('Lopez', 0);
     }
 
     async LoadScene() {
@@ -302,30 +304,77 @@ class Scene {
                     }
                 }
                 hitbox.drawRect(
-                    split.pos.x -
-                        this.package_meta.assets[split.layer][split.material_id]
-                            .offset.x +
-                        159 +
-                        hitarea.ex,
-                    split.pos.y -
-                        this.package_meta.assets[split.layer][split.material_id]
-                            .offset.y +
-                        145 +
-                        hitarea.ey,
+                    split.pos.x-this.package_meta.assets[split.layer][split.material_id].offset.x+159+hitarea.ex,
+                    split.pos.y-this.package_meta.assets[split.layer][split.material_id].offset.y+145+hitarea.ey,
                     hitarea.ox - hitarea.ex,
                     hitarea.oy - hitarea.ey,
                 );
-                hitbox.x;
-                hitbox.y;
+                map_judge.addRectangle({
+                    start_x: split.pos.x-this.package_meta.assets[split.layer][split.material_id].offset.x+159+hitarea.ex - 13,
+                    start_y: split.pos.y-this.package_meta.assets[split.layer][split.material_id].offset.y+145+hitarea.ey - 19,
+                    end_x: split.pos.x-this.package_meta.assets[split.layer][split.material_id].offset.x+159+hitarea.ox + 15,
+                    end_y: split.pos.y-this.package_meta.assets[split.layer][split.material_id].offset.y+145+hitarea.oy - 5,
+                })
+                hitbox.zIndex = split.pos.y-this.package_meta.assets[split.layer][split.material_id].offset.y+300;
                 hitbox.alpha = 0.4;
-                hitbox.zIndex = split.pos.y + 300;
                 sceneContainer.addChild(hitbox);
             }
         }
     }
+
+    async creatCharacter(name: string, type: number) {
+        const id = uuid();
+        let character = new Sprite(
+            await this.package_meta.assets[Layer.sleepers][type].texture,
+        );
+        character.zIndex = character.y - 7.5;
+        sceneContainer.addChild(character);
+
+        const hitbox = new Graphics();
+        hitbox.beginFill(0xffffff);
+        hitbox.alpha = 0.5;
+        hitbox.drawRect(64,124,30,16);
+        character.addChild(hitbox);
+
+        let speed = 1;
+        window.addEventListener('keydown', e => {
+            switch (e.code) {
+                case 'ArrowUp':
+                    if (!map_judge.judgePointInRectangle({x: character.x + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y - speed + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
+                        character.y -= speed;
+                        character.zIndex = character.y - 7.5;
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (!map_judge.judgePointInRectangle({x: character.x + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + speed + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
+                        character.y += speed;
+                        character.zIndex = character.y - 7.5;
+                    }
+                    break;
+                case 'ArrowLeft':
+                    if (!map_judge.judgePointInRectangle({x: character.x - speed + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
+                        character.x -= speed;
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (!map_judge.judgePointInRectangle({x: character.x + speed + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
+                        character.x += speed;
+                    }
+                    break;
+                case 'KeyZ':
+                    speed = 20;
+                    break;
+                case 'KeyX':
+                    speed = 1;
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
 }
 
-let sceneContainer = new Container();
+export let sceneContainer = new Container();
 sceneContainer.sortableChildren = true;
 viewport.addChild(sceneContainer);
 
