@@ -8,6 +8,7 @@ import {
 } from 'pixi.js';
 import { v4 as uuid } from 'uuid';
 import { viewport } from '../Main';
+import { Astar, to_path } from './Astar';
 import { map_judge } from './Reach';
 
 interface SceneMap {
@@ -336,28 +337,41 @@ class Scene {
         hitbox.drawRect(64,124,30,16);
         character.addChild(hitbox);
 
+        viewport.addEventListener("clicked", (event: any) => {
+            let cur_x = character.x + this.package_meta.assets[Layer.sleepers][type].offset.x;
+            let cur_y = character.y + this.package_meta.assets[Layer.sleepers][type].offset.y;
+            let target_x = event.world.x;
+            let target_y = event.world.y;
+            if (!map_judge.judgePointInRectangle({x: Math.round(target_x), y: Math.round(target_y - 8)})) {
+                console.log(to_path(Astar({x: Math.round(cur_x), y: Math.round(cur_y)}, {x: Math.round(target_x), y: Math.round(target_y)}, p => map_judge.judgePointInRectangleWithCache({x: p.x, y: p.y}))));
+                character.x = target_x - this.package_meta.assets[Layer.sleepers][type].offset.x;
+                character.y = target_y - this.package_meta.assets[Layer.sleepers][type].offset.y;
+            }
+            character.zIndex = character.y - 7.5;
+        })
+
         let speed = 1;
         window.addEventListener('keydown', e => {
             switch (e.code) {
                 case 'ArrowUp':
-                    if (!map_judge.judgePointInRectangle({x: character.x + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y - speed + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
+                    if (!map_judge.judgePointOnLine({x: character.x + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y - speed + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
                         character.y -= speed;
                         character.zIndex = character.y - 7.5;
                     }
                     break;
                 case 'ArrowDown':
-                    if (!map_judge.judgePointInRectangle({x: character.x + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + speed + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
+                    if (!map_judge.judgePointOnLine({x: character.x + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + speed + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
                         character.y += speed;
                         character.zIndex = character.y - 7.5;
                     }
                     break;
                 case 'ArrowLeft':
-                    if (!map_judge.judgePointInRectangle({x: character.x - speed + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
+                    if (!map_judge.judgePointOnLine({x: character.x - speed + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
                         character.x -= speed;
                     }
                     break;
                 case 'ArrowRight':
-                    if (!map_judge.judgePointInRectangle({x: character.x + speed + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
+                    if (!map_judge.judgePointOnLine({x: character.x + speed + this.package_meta.assets[Layer.sleepers][type].offset.x, y: character.y + this.package_meta.assets[Layer.sleepers][type].offset.y - 8})) {
                         character.x += speed;
                     }
                     break;

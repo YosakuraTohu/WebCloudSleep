@@ -1,7 +1,3 @@
-import { Graphics } from "pixi.js";
-import { Astar, PathNode, Position } from "./Astar";
-import { sceneContainer } from "./Futures";
-
 export interface Point {
     x: number;
     y: number;
@@ -23,18 +19,24 @@ export type JudgeList = {
     [propName: number]: Array<Line>;
 }
 
+type Cache = Object & {
+    [propName: string]: boolean;
+}
+
 export class MapJudge {
     private MAX_WIDTH: number;
     private MAX_HEIGHT: number;
 
     private x_axis_judge_list: JudgeList;
     private y_axis_judge_list: JudgeList;
+    private cache: Cache;
 
     constructor() {
         this.MAX_WIDTH = 0;
         this.MAX_HEIGHT = 0;
         this.x_axis_judge_list = {};
         this.y_axis_judge_list = {};
+        this.cache = {};
     }
 
     public addRectangle({start_x, start_y, end_x, end_y}: Rectangle) {
@@ -68,11 +70,6 @@ export class MapJudge {
         if (Array.isArray(this.x_axis_judge_list[y])) {
             for (const line of this.x_axis_judge_list[y]) {
                 if (x >= line.start_point && x <= line.end_point) {
-                    const hitbox = new Graphics();
-                    hitbox.beginFill(0x000fff);
-                    hitbox.drawRect(line.start_point, y,line.end_point - line.start_point, 10);
-                    hitbox.zIndex = 40000;
-                    sceneContainer.addChild(hitbox);
                     return true;
                 }
             }
@@ -138,19 +135,16 @@ export class MapJudge {
         }
         return false;
     }
+
+    public judgePointInRectangleWithCache({x, y}: Point): boolean {
+        if (!this.cache.hasOwnProperty(`${x}-${y}`)) {
+            this.cache[`${x}-${y}`] = this.judgePointInRectangle({x, y});           
+        }
+        return this.cache[`${x}-${y}`];
+    }
 }
 
 export let map_judge = new MapJudge();
 
-let path: Array<Position> = [];
-
-let u = (p: PathNode): Array<Position> => {
-    if (p.parent === null) {
-        path.push(p.position);
-        return path;
-    }
-    path.push(p.position);
-    return u(p.parent);
-}
-
-console.log(u(Astar({x: 0, y: 0}, {x: 90, y: 12})))
+/* console.log(to_path(Astar({x: 0, y: 0}, {x: 10, y: 12})))
+console.log(to_path(Astar({x: -3, y: 0}, {x: 0, y: 2}))) */
